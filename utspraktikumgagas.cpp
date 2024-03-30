@@ -1,0 +1,156 @@
+#include <iomanip>
+#include <iostream>
+#include <string>
+using namespace std;
+
+struct Karyawan {
+    string nama;
+    string tanggallahir;
+    string gajiPokok;  // Menggunakan string untuk gaji pokok
+};
+
+struct Node {
+    Karyawan data;
+    Node* next;
+};
+
+class ManajemenKaryawan {
+private:
+    Node* head;
+
+public:
+    ManajemenKaryawan() : head(nullptr) {}
+
+    ~ManajemenKaryawan() {
+        Node* current = head;
+        while (current != nullptr) {
+            Node* next = current->next;
+            delete current;
+            current = next;
+        }
+        head = nullptr;
+    }
+
+    void tambahKaryawan(const Karyawan& karyawan) {
+        Node* newNode = new Node{ karyawan, nullptr };
+        if (!head) {
+            head = newNode;
+        } else {
+            Node* temp = head;
+            while (temp->next) {
+                temp = temp->next;
+            }
+            temp->next = newNode;
+        }
+    }
+
+    void tampilkanKaryawan() {
+        cout << left << setw(20) << "Nama" 
+             << setw(15) << "Tanggal Lahir" 
+             << setw(12) << "Gaji Pokok" << endl;
+        cout << setfill('-') << setw(47) << "-" << setfill(' ') << endl;
+
+        Node* temp = head;
+        while (temp) {
+            cout << setw(20) << temp->data.nama 
+                 << setw(15) << temp->data.tanggallahir 
+                 << setw(12) << temp->data.gajiPokok << endl;
+            temp = temp->next;
+        }
+    }
+
+    void editKaryawan(const string& nama, const Karyawan& newData) {
+        Node* temp = head;
+        while (temp) {
+            if (temp->data.nama == nama) {
+                temp->data = newData;
+                return;
+            }
+            temp = temp->next;
+        }
+    }
+
+    void hapusKaryawan(const string& nama) {
+        Node* temp = head;
+        Node* prev = nullptr;
+        
+        if (temp != nullptr && temp->data.nama == nama) {
+            head = temp->next;
+            delete temp;
+            return;
+        }
+
+        while (temp != nullptr && temp->data.nama != nama) {
+            prev = temp;
+            temp = temp->next;
+        }
+
+        if (temp == nullptr) return;
+
+        prev->next = temp->next;
+        delete temp;
+    }
+};
+
+void menu() {
+    cout << "\nManajemen Karyawan\n";
+    cout << "1. Tambah Karyawan\n";
+    cout << "2. Tampilkan Karyawan\n";
+    cout << "3. Edit Karyawan\n";
+    cout << "4. Hapus Karyawan\n";
+    cout << "5. Keluar\n";
+    cout << "Masukkan pilihan Anda: ";
+}
+
+int main() {
+    ManajemenKaryawan mk;
+    int pilihan;
+    string nama;
+    Karyawan k;
+
+    do {
+        menu();
+        cin >> pilihan;
+        switch (pilihan) {
+            case 1:
+                cout << "Masukkan nama: ";
+                cin.ignore();
+                getline(cin, k.nama);
+                cout << "Masukkan tanggal lahir: ";
+                getline(cin, k.tanggallahir);
+                cout << "Masukkan gaji pokok: ";
+                getline(cin, k.gajiPokok);
+                mk.tambahKaryawan(k);
+                break;
+            case 2:
+                mk.tampilkanKaryawan();
+                break;
+            case 3:
+                cout << "Masukkan nama karyawan yang akan diedit: ";
+                cin.ignore();
+                getline(cin, nama);
+                cout << "Masukkan data baru\n";
+                cout << "Nama: ";
+                getline(cin, k.nama);
+                cout << "Tanggal lahir: ";
+                getline(cin, k.tanggallahir);
+                cout << "Gaji pokok: ";
+                getline(cin, k.gajiPokok);
+                mk.editKaryawan(nama, k);
+                break;
+            case 4:
+                cout << "Masukkan nama karyawan yang akan dihapus: ";
+                cin.ignore();
+                getline(cin, nama);
+                mk.hapusKaryawan(nama);
+                break;
+            case 5:
+                cout << "Keluar dari program.\n";
+                break;
+            default:
+                cout << "Pilihan tidak valid, silakan coba lagi.\n";
+        }
+    } while (pilihan != 5);
+
+    return 0;
+}
